@@ -1,0 +1,1520 @@
+<title>MCO como BLUE</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#F6F5F0;
+    --surface:#FFFFFF;
+    --surface-2:#EDE9DD;
+    --surface-3:#E3DFCF;
+    --ink:#1E2230;
+    --ink-muted:#5B5F6E;
+    --ink-faint:#8A8E9C;
+    --border:#DBD5C4;
+    --border-strong:#C6BFA9;
+    --accent:#2C4870;
+    --accent-soft:#D7E0EC;
+    --accent-2:#8A2F3B;
+    --accent-2-soft:#EFDBDD;
+    --accent-3:#A9781F;
+    --good:#3F7D5C;
+    --good-soft:#DCEAE1;
+    --bad:#B23A3A;
+    --bad-soft:#F3DEDE;
+    --warn:#A9781F;
+    --warn-soft:#F1E6C9;
+    --shadow: 0 1px 2px rgba(30,34,48,.06), 0 6px 16px -8px rgba(30,34,48,.12);
+    --radius: 10px;
+    --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161D;
+      --surface:#1B1E27;
+      --surface-2:#232733;
+      --surface-3:#2B3040;
+      --ink:#EAE8E0;
+      --ink-muted:#A6AAB8;
+      --ink-faint:#767A8A;
+      --border:#333748;
+      --border-strong:#454A5F;
+      --accent:#8FB0E0;
+      --accent-soft:#243349;
+      --accent-2:#E09BA3;
+      --accent-2-soft:#3A2530;
+      --accent-3:#E4BB6C;
+      --good:#7FCBA2;
+      --good-soft:#1E3A2E;
+      --bad:#E68686;
+      --bad-soft:#3E2323;
+      --warn:#E4BB6C;
+      --warn-soft:#3B301A;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 20px -8px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161D;
+    --surface:#1B1E27;
+    --surface-2:#232733;
+    --surface-3:#2B3040;
+    --ink:#EAE8E0;
+    --ink-muted:#A6AAB8;
+    --ink-faint:#767A8A;
+    --border:#333748;
+    --border-strong:#454A5F;
+    --accent:#8FB0E0;
+    --accent-soft:#243349;
+    --accent-2:#E09BA3;
+    --accent-2-soft:#3A2530;
+    --accent-3:#E4BB6C;
+    --good:#7FCBA2;
+    --good-soft:#1E3A2E;
+    --bad:#E68686;
+    --bad-soft:#3E2323;
+    --warn:#E4BB6C;
+    --warn-soft:#3B301A;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 20px -8px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);font-size:14px;line-height:1.5;}
+  h1,h2,h3{font-family:var(--font-serif);font-weight:600;margin:0;text-wrap:balance;color:var(--ink);}
+  ::selection{background:var(--accent-soft);}
+  a{color:var(--accent);}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+  button{font-family:var(--font-sans);cursor:pointer;}
+  input,select{font-family:var(--font-sans);}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ---------- shell ---------- */
+  .shell{max-width:1560px;margin:0 auto;padding:20px 20px 48px;}
+  .topbar{padding:6px 4px 20px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+  .topbar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+  .topbar .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-2);margin-bottom:6px;}
+  .theme-toggle{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--border-strong);border-radius:100px;background:var(--surface);color:var(--ink);font-size:12px;font-weight:500;box-shadow:var(--shadow);}
+  .theme-toggle:hover{filter:brightness(0.97);}
+  :root[data-theme="dark"] .theme-toggle:hover{filter:brightness(1.18);}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .theme-toggle:hover{filter:brightness(1.18);} }
+  .theme-toggle-icon{font-size:14px;line-height:1;}
+  .topbar h1{font-size:27px;}
+  .topbar .lede{max-width:920px;color:var(--ink-muted);margin-top:10px;font-size:14.5px;}
+  .topbar .lede b{color:var(--ink);font-weight:600;}
+  .notation{margin-top:14px;padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;color:var(--ink-muted);display:flex;flex-wrap:wrap;gap:6px 22px;}
+  .notation code{font-family:var(--font-mono);color:var(--ink);background:none;}
+
+  .body-grid{display:grid;grid-template-columns:352px 1fr;gap:18px;align-items:start;}
+  @media (max-width:1080px){ .body-grid{grid-template-columns:1fr;} }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{position:sticky;top:16px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto;padding-right:4px;}
+  @media (max-width:1080px){ .sidebar{position:static;max-height:none;} }
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+  .ctrl-card{padding:14px 15px 15px;}
+  .ctrl-card + .ctrl-card{margin-top:0;}
+  .ctrl-card h3{font-size:13px;letter-spacing:.02em;}
+  .ctrl-card .assumption-tag{display:inline-block;margin-left:7px;font-family:var(--font-mono);font-size:10px;color:var(--accent-2);background:var(--accent-2-soft);border-radius:5px;padding:1px 6px;vertical-align:middle;letter-spacing:.02em;}
+  .ctrl-card p.help{margin:5px 0 12px;color:var(--ink-muted);font-size:12px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:11.5px;color:var(--ink-muted);}
+  .var-toggle-label{display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .var-toggle-label input[type=checkbox]{accent-color:var(--accent);margin:0;}
+  .field input[type=number]:disabled{opacity:.45;cursor:not-allowed;background:var(--surface-2);}
+  .field input[type=number],.field select{width:100%;padding:6px 7px;border:1px solid var(--border-strong);border-radius:6px;background:var(--surface);color:var(--ink);font-size:12.5px;}
+  .field input[type=range]{width:100%;accent-color:var(--accent);}
+  .range-readout{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);}
+  .checkline{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink);margin:6px 0;}
+  .checkline input{accent-color:var(--accent);}
+  .divider{height:1px;background:var(--border);margin:11px 0;}
+  .btn{border:1px solid var(--border-strong);background:var(--surface-2);color:var(--ink);padding:8px 11px;border-radius:7px;font-size:12.5px;font-weight:500;transition:filter .1s;}
+  .btn:hover{filter:brightness(0.97);}
+  :root[data-theme="dark"] .btn:hover, @media (prefers-color-scheme:dark){ .btn:hover{filter:brightness(1.15);} }
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#F6F5F0;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-accent2{background:var(--accent-2);border-color:var(--accent-2);color:#F6F5F0;}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .btn-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .btn-row .btn{flex:1 1 auto;}
+  .seed-row{display:flex;gap:7px;align-items:flex-end;}
+  .seed-row .field{flex:1;}
+  .status-line{font-size:11.5px;color:var(--ink-faint);margin-top:8px;font-family:var(--font-mono);min-height:14px;}
+
+  /* ---------- workspace ---------- */
+  .workspace{display:flex;flex-direction:column;gap:16px;min-width:0;}
+  .assumptions{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  @media (max-width:920px){ .assumptions{grid-template-columns:repeat(2,1fr);} }
+  .assump-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 11px;box-shadow:var(--shadow);}
+  .assump-card .num{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);letter-spacing:.05em;}
+  .assump-card .name{font-size:12px;font-weight:600;margin:2px 0 6px;color:var(--ink);}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-family:var(--font-mono);padding:2.5px 8px;border-radius:100px;font-weight:500;}
+  .pill .dot{width:6px;height:6px;border-radius:50%;}
+  .pill.ok{background:var(--good-soft);color:var(--good);}
+  .pill.ok .dot{background:var(--good);}
+  .pill.bad{background:var(--bad-soft);color:var(--bad);}
+  .pill.bad .dot{background:var(--bad);}
+  .pill.warn{background:var(--warn-soft);color:var(--warn);}
+  .pill.warn .dot{background:var(--warn);}
+  .pill.na{background:var(--surface-2);color:var(--ink-faint);}
+  .pill.na .dot{background:var(--ink-faint);}
+  .assump-card .detail{margin-top:6px;font-size:11px;color:var(--ink-muted);line-height:1.4;}
+  .normality-note{grid-column:1/-1;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:var(--radius);padding:9px 12px;font-size:11.5px;color:var(--ink-muted);}
+  .normality-note b{color:var(--ink);}
+
+  .panel-row{display:grid;gap:16px;}
+  .row-top{grid-template-columns:1.15fr 1fr;}
+  .row-bottom{grid-template-columns:1fr 1fr 1fr;}
+  @media (max-width:1300px){ .row-top{grid-template-columns:1fr;} .row-bottom{grid-template-columns:1fr;} }
+
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface-2);flex-wrap:wrap;}
+  .panel-head .titles{display:flex;flex-direction:column;gap:1px;}
+  .panel-head h3{font-size:13.5px;}
+  .panel-head .sub{font-size:10.5px;color:var(--ink-faint);font-family:var(--font-mono);}
+  .panel-controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .panel-controls select{padding:4px 6px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);color:var(--ink);font-size:11px;}
+  .panel-controls .mini-label{font-size:10.5px;color:var(--ink-faint);margin-right:2px;}
+  .plot{width:100%;height:360px;}
+  .plot.tall{height:400px;}
+  .panel-note{padding:8px 14px;font-size:11px;color:var(--ink-faint);border-top:1px solid var(--border);background:var(--surface);}
+
+  .empty-state{display:flex;align-items:center;justify-content:center;height:360px;color:var(--ink-faint);font-size:12.5px;text-align:center;padding:0 30px;}
+
+  .tables-row{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
+  @media (max-width:1080px){ .tables-row{grid-template-columns:1fr;} }
+  .table-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .table-panel h3{font-size:13px;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface-2);}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th,td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;}
+  thead th{color:var(--ink-muted);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.mono, th.mono{font-family:var(--font-mono);}
+  .flag{font-size:9.5px;font-family:var(--font-mono);padding:1px 5px;border-radius:4px;margin-left:5px;}
+  .flag.bad{background:var(--bad-soft);color:var(--bad);}
+  .table-scroll{overflow-x:auto;}
+  .table-empty{padding:22px 14px;color:var(--ink-faint);font-size:12px;}
+
+  footer.credit{margin-top:22px;padding-top:14px;border-top:1px solid var(--border);color:var(--ink-faint);font-size:11px;}
+</style>
+
+<div class="shell">
+
+  <div class="topbar">
+    <div class="topbar-head">
+      <div class="eyebrow">Asistente Docencia Econometría y Estadística — laboratorio interactivo</div>
+      <button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false" title="Cambiar entre fondo claro y oscuro">
+        <span class="theme-toggle-icon" aria-hidden="true">&#9728;&#65039;</span>
+        <span class="theme-toggle-label">Claro</span>
+      </button>
+    </div>
+    <h1>El teorema de Gauss&#8211;Markov en acción: por qué MCO es BLUE</h1>
+    <p class="lede">Este simulador genera una <b>población</b> finita a partir de un proceso generador de datos (PGD) totalmente configurable —incluyendo violaciones deliberadas de los cinco supuestos clásicos— y permite extraer muestras repetidas para observar, de manera empírica, las propiedades de <b>insesgadez</b>, <b>eficiencia</b> y <b>consistencia</b> del estimador de Mínimos Cuadrados Ordinarios (MCO). El teorema de Gauss&#8211;Markov establece que, bajo los supuestos MLR.1&#8211;MLR.5 (Wooldridge, 2020), &#946;&#770; es el <i>Best Linear Unbiased Estimator</i> (BLUE): el estimador lineal insesgado de mínima varianza dentro de esa clase.</p>
+    <div class="notation">
+      <span><code>Y = &#946;&#8320; + &#946;&#8321;X&#8321; + &#946;&#8322;X&#8322; + &#946;&#8323;Z + u</code></span>
+      <span>&#946;&#770; &#8212; estimador muestral</span>
+      <span>u &#8212; perturbación poblacional</span>
+      <span>Z &#8712; {0,1} &#8212; dummy binaria</span>
+      <span>n &#8212; tamaño muestral</span>
+      <span>R &#8212; repeticiones Monte Carlo</span>
+    </div>
+  </div>
+
+  <div class="body-grid">
+
+    <!-- ============ SIDEBAR: CONTROLES ============ -->
+    <aside class="sidebar">
+
+      <div class="card ctrl-card">
+        <h3>1 &middot; Parámetros estructurales del PGD</h3>
+        <p class="help">Valores verdaderos y desconocidos que el investigador nunca observa en la práctica; aquí se fijan para poder evaluar el desempeño del estimador. Las casillas junto a &#946;&#8321;, &#946;&#8322; y &#946;&#8323; deciden qué variables se <b>realizan</b> —es decir, participan efectivamente— en el proceso generador: al desactivar una, su &#946; se fija en 0 y la variable pasa a ser verdaderamente irrelevante para Y, aunque sigue existiendo en la población y puede incorporarse a la estimación (§5) para comprobar que MCO no la sesga por incluirla.</p>
+        <div class="field-row">
+          <div class="field"><label for="beta0">&#946;&#8320; (intercepto)</label><input type="number" id="beta0" value="5" step="0.5"></div>
+          <div class="field">
+            <label for="beta1" class="var-toggle-label"><input type="checkbox" id="popActiveX1" checked> &#946;&#8321; (X&#8321;)</label>
+            <input type="number" id="beta1" value="2" step="0.5">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="beta2" class="var-toggle-label"><input type="checkbox" id="popActiveX2" checked> &#946;&#8322; (X&#8322;)</label>
+            <input type="number" id="beta2" value="-1.5" step="0.5">
+          </div>
+          <div class="field">
+            <label for="beta3" class="var-toggle-label"><input type="checkbox" id="popActiveZ" checked> &#946;&#8323; (Z)</label>
+            <input type="number" id="beta3" value="3" step="0.5">
+          </div>
+        </div>
+        <div class="status-line" id="pgdActiveStatus">Variables realizadas en el PGD: X&#8321;, X&#8322;, Z.</div>
+      </div>
+
+      <div class="card ctrl-card">
+        <h3>2 &middot; Regresores X&#8321;, X&#8322; <span class="assumption-tag">MLR.3</span></h3>
+        <p class="help">La correlación entre X&#8321; y X&#8322; permite acercar el diseño a la colinealidad (imperfecta o casi perfecta).</p>
+        <div class="field-row">
+          <div class="field"><label for="x1dist">Distribución X&#8321;</label>
+            <select id="x1dist"><option value="normal">Normal</option><option value="skew">Asimétrica (no normal)</option></select>
+          </div>
+          <div class="field"><label for="x2dist">Distribución X&#8322;</label>
+            <select id="x2dist"><option value="normal">Normal</option><option value="skew">Asimétrica (no normal)</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="x1mu">&#956;(X&#8321;)</label><input type="number" id="x1mu" value="10" step="1"></div>
+          <div class="field"><label for="x1sigma">&#963;(X&#8321;)</label><input type="number" id="x1sigma" value="3" step="0.5" min="0.1"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="x2mu">&#956;(X&#8322;)</label><input type="number" id="x2mu" value="5" step="1"></div>
+          <div class="field"><label for="x2sigma">&#963;(X&#8322;)</label><input type="number" id="x2sigma" value="2" step="0.5" min="0.1"></div>
+        </div>
+        <div class="field">
+          <label for="rhoX">Correlación nominal &#961;(X&#8321;,X&#8322;) &#8212; <span id="rhoXval" class="mono">0.00</span></label>
+          <input type="range" id="rhoX" min="-0.95" max="0.95" step="0.05" value="0">
+          <div class="range-readout"><span>colineal (&#8722;)</span><span>independientes</span><span>colineal (+)</span></div>
+        </div>
+      </div>
+
+      <div class="card ctrl-card">
+        <h3>3 &middot; Proceso del error u <span class="assumption-tag">MLR.4 · MLR.5</span></h3>
+        <p class="help">La media distinta de cero y la correlación con los regresores rompen la <i>exogeneidad</i> (E[u|X]=0); la heterocedasticidad rompe la varianza constante.</p>
+        <div class="field-row">
+          <div class="field"><label for="uMu">&#956;(u) &#8212; media del error</label><input type="number" id="uMu" value="0" step="0.5"></div>
+          <div class="field"><label for="uSigma">&#963;(u) &#8212; dispersión</label><input type="number" id="uSigma" value="4" step="0.5" min="0.1"></div>
+        </div>
+        <div class="field">
+          <label for="uDist">Distribución de u</label>
+          <select id="uDist"><option value="normal">Normal</option><option value="skew">Asimétrica (no normal)</option></select>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+          <label for="rhoU1">Corr(u, X&#8321;) &#8212; endogeneidad &#8212; <span id="rhoU1val" class="mono">0.00</span></label>
+          <input type="range" id="rhoU1" min="-0.9" max="0.9" step="0.05" value="0">
+        </div>
+        <div class="field">
+          <label for="rhoU2">Corr(u, X&#8322;) &#8212; endogeneidad &#8212; <span id="rhoU2val" class="mono">0.00</span></label>
+          <input type="range" id="rhoU2" min="-0.9" max="0.9" step="0.05" value="0">
+        </div>
+        <div class="divider"></div>
+        <label class="checkline"><input type="checkbox" id="hetero"> Activar heterocedasticidad: Var(u|X&#8321;) creciente en |X&#8321;|</label>
+        <div class="field">
+          <label for="heteroGamma">&#947; &#8212; intensidad heterocedástica &#8212; <span id="heteroGammaVal" class="mono">1.20</span></label>
+          <input type="range" id="heteroGamma" min="0" max="3" step="0.1" value="1.2">
+        </div>
+      </div>
+
+      <div class="card ctrl-card">
+        <h3>4 &middot; Población</h3>
+        <p class="help">Se genera una única vez una población finita de tamaño N; toda extracción muestral posterior se realiza sin reemplazo sobre ella, con semilla reproducible (cf. Wooldridge, 2020, §C.2).</p>
+        <div class="field-row">
+          <div class="field"><label for="Npop">N poblacional</label><input type="number" id="Npop" value="200000" step="10000" min="20000" max="500000"></div>
+          <div class="field"><label for="seed">Semilla</label><input type="number" id="seed" value="20260908" step="1"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="genPopBtn" style="flex:2">Generar población</button>
+          <button class="btn" id="randSeedBtn" title="Sortear una nueva semilla aleatoria">&#8635; semilla</button>
+        </div>
+        <div class="status-line" id="popStatus">Población no generada aún.</div>
+      </div>
+
+      <div class="card ctrl-card">
+        <h3>5 &middot; Diseño muestral</h3>
+        <div class="field-row">
+          <div class="field"><label for="nSize">Tamaño de muestra n</label>
+            <select id="nSize">
+              <option value="10">10</option><option value="50">50</option><option value="100" selected>100</option>
+              <option value="1000">1000</option><option value="10000">10000</option>
+            </select>
+          </div>
+          <div class="field"><label for="Rreps">Repeticiones R (Monte Carlo)</label><input type="number" id="Rreps" value="200" min="10" max="2000" step="10"></div>
+        </div>
+        <div class="field" style="margin-bottom:4px;">
+          <label>Regresores a incluir en el modelo estimado</label>
+          <label class="checkline"><input type="checkbox" id="regX1" checked> X&#8321;</label>
+          <label class="checkline"><input type="checkbox" id="regX2" checked> X&#8322;</label>
+          <label class="checkline"><input type="checkbox" id="regZ"> Z (dummy)</label>
+        </div>
+        <div class="divider"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="newSampleBtn" disabled>Extraer nueva muestra</button>
+          <button class="btn" id="pinLineBtn" disabled>Fijar recta actual</button>
+        </div>
+        <div class="btn-row" style="margin-top:7px;">
+          <button class="btn" id="clearPinsBtn" disabled>Limpiar rectas fijadas</button>
+          <button class="btn btn-accent2" id="runMCBtn" disabled>Ejecutar Monte Carlo (R)</button>
+        </div>
+        <div class="status-line" id="sampleStatus">Genere la población para habilitar el muestreo.</div>
+      </div>
+
+    </aside>
+
+    <!-- ============ WORKSPACE ============ -->
+    <main class="workspace">
+
+      <section class="assumptions" id="assumptionsStrip">
+        <div class="assump-card"><div class="num">MLR.1</div><div class="name">Linealidad en los parámetros</div><span class="pill ok"><span class="dot"></span>Se cumple</span><div class="detail">El PGD es lineal en &#946; por construcción del simulador.</div></div>
+        <div class="assump-card"><div class="num">MLR.2</div><div class="name">Muestreo aleatorio</div><span class="pill ok"><span class="dot"></span>Se cumple</span><div class="detail">Cada muestra es una extracción aleatoria simple sin reemplazo.</div></div>
+        <div class="assump-card" id="assump3"><div class="num">MLR.3</div><div class="name">No colinealidad perfecta</div><span class="pill na"><span class="dot"></span>&#8212;</span><div class="detail">Depende de &#961;(X&#8321;,X&#8322;) y de los regresores incluidos.</div></div>
+        <div class="assump-card" id="assump4"><div class="num">MLR.4</div><div class="name">Media condicional nula E[u|X]=0</div><span class="pill na"><span class="dot"></span>&#8212;</span><div class="detail">Depende de &#956;(u) y de Corr(u,X&#8321;), Corr(u,X&#8322;).</div></div>
+        <div class="assump-card" id="assump5"><div class="num">MLR.5</div><div class="name">Homocedasticidad Var(u|X)=&#963;&#178;</div><span class="pill na"><span class="dot"></span>&#8212;</span><div class="detail">Depende del interruptor de heterocedasticidad.</div></div>
+        <div class="normality-note">Nota adicional (MLR.6, no forma parte de las condiciones de Gauss&#8211;Markov): la <b>normalidad</b> de u no es requisito para que MCO sea BLUE; garantiza, en cambio, la distribución exacta t/F en muestras finitas. Con errores no normales, MCO conserva insesgadez y eficiencia dentro de la clase lineal, pero la inferencia exacta pierde validez y solo se recupera asintóticamente (TLC) — compárese el ajuste de los histogramas inferiores para n pequeño vs. n grande.</div>
+      </section>
+
+      <section class="panel-row row-top">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles"><h3>Dispersión 3D y plano de mejor ajuste</h3><span class="sub" id="panel3dSub">Y vs. dos regresores</span></div>
+            <div class="panel-controls" id="panel3dControls"></div>
+          </div>
+          <div id="plot3d" class="plot tall"></div>
+          <div class="panel-note" id="panel3dNote">Extraiga una muestra para visualizar la nube de puntos y el plano ajustado.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles"><h3>Dispersión 2D y recta de regresión</h3><span class="sub">fije rectas entre remuestreos para visualizar la variabilidad muestral</span></div>
+            <div class="panel-controls" id="panel2dControls"></div>
+          </div>
+          <div id="plot2d" class="plot tall"></div>
+          <div class="panel-note" id="panel2dNote">Rectas fijadas: <span class="mono" id="pinCount">0</span></div>
+        </div>
+      </section>
+
+      <section class="panel-row row-bottom">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles"><h3>Distribución muestral de &#946;&#770;</h3><span class="sub">histograma A</span></div>
+            <div class="panel-controls" id="histAControls"></div>
+          </div>
+          <div id="plotHistA" class="plot"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles"><h3>Distribución muestral de &#946;&#770;</h3><span class="sub">histograma B</span></div>
+            <div class="panel-controls" id="histBControls"></div>
+          </div>
+          <div id="plotHistB" class="plot"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles"><h3>Coordenadas de los &#946;&#770; estimados</h3><span class="sub">nube conjunta vs. valor poblacional</span></div>
+            <div class="panel-controls" id="coordControls"></div>
+          </div>
+          <div id="plotCoords" class="plot"></div>
+        </div>
+      </section>
+
+      <section class="tables-row">
+        <div class="table-panel">
+          <h3>Muestra vigente &#8212; coeficientes estimados</h3>
+          <div class="table-scroll" id="currentTableWrap"><div class="table-empty">Sin muestra extraída.</div></div>
+        </div>
+        <div class="table-panel">
+          <h3>Simulación Monte Carlo &#8212; propiedades del estimador</h3>
+          <div class="table-scroll" id="mcTableWrap"><div class="table-empty">Sin simulación ejecutada.</div></div>
+        </div>
+      </section>
+
+      <footer class="credit">Simulador construido íntegramente en el navegador (JavaScript, sin dependencias de servidor); generador de números pseudoaleatorios mulberry32 con semilla explícita para garantizar reproducibilidad. Referencias: Wooldridge, J. M. (2020). <i>Introductory Econometrics: A Modern Approach</i> (7.ª ed.). Cengage. · Stock, J. H., &amp; Watson, M. W. (2019). <i>Introduction to Econometrics</i> (4.ª ed.). Pearson.</footer>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.5.1/plotly.min.js"></script>
+<script>
+"use strict";
+/* ======================================================================
+   MCO como BLUE — motor estadístico y de visualización
+   ====================================================================== */
+
+/* ---------------------------------------------------------------------
+   0. Generador pseudoaleatorio con semilla (mulberry32) y normal (Box–Muller)
+   --------------------------------------------------------------------- */
+function mulberry32(seed){
+  let a = seed >>> 0;
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function makeNormalRng(uniformRng){
+  let spare = null;
+  return function(){
+    if (spare !== null){ const v = spare; spare = null; return v; }
+    let u1 = 0, u2;
+    while (u1 <= 1e-12) u1 = uniformRng();
+    u2 = uniformRng();
+    const r = Math.sqrt(-2 * Math.log(u1));
+    const theta = 2 * Math.PI * u2;
+    spare = r * Math.sin(theta);
+    return r * Math.cos(theta);
+  };
+}
+
+/* ---------------------------------------------------------------------
+   1. Álgebra lineal mínima (hasta 4×4): resolución y matriz inversa
+   --------------------------------------------------------------------- */
+function gaussSolve(Ain, bin){
+  const k = bin.length;
+  const A = Ain.map(r => r.slice());
+  const b = bin.slice();
+  for (let col = 0; col < k; col++){
+    let piv = col;
+    for (let r = col + 1; r < k; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
+    if (piv !== col){ [A[col], A[piv]] = [A[piv], A[col]]; [b[col], b[piv]] = [b[piv], b[col]]; }
+    const d = A[col][col] || 1e-12;
+    for (let r = 0; r < k; r++){
+      if (r === col) continue;
+      const f = A[r][col] / d;
+      if (f === 0) continue;
+      for (let c = col; c < k; c++) A[r][c] -= f * A[col][c];
+      b[r] -= f * b[col];
+    }
+  }
+  return A.map((row, i) => b[i] / (row[i] || 1e-12));
+}
+function invertMatrix(Ain){
+  const k = Ain.length;
+  const A = Ain.map(r => r.slice());
+  const I = Array.from({length:k}, (_,i) => Array.from({length:k}, (_,j) => (i===j?1:0)));
+  for (let col = 0; col < k; col++){
+    let piv = col;
+    for (let r = col + 1; r < k; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
+    if (piv !== col){ [A[col], A[piv]] = [A[piv], A[col]]; [I[col], I[piv]] = [I[piv], I[col]]; }
+    const d = A[col][col] || 1e-12;
+    for (let c = 0; c < k; c++){ A[col][c] /= d; I[col][c] /= d; }
+    for (let r = 0; r < k; r++){
+      if (r === col) continue;
+      const f = A[r][col];
+      if (f === 0) continue;
+      for (let c = 0; c < k; c++){ A[r][c] -= f * A[col][c]; I[r][c] -= f * I[col][c]; }
+    }
+  }
+  return I;
+}
+
+/* ---------------------------------------------------------------------
+   2. Utilidades numéricas
+   --------------------------------------------------------------------- */
+function mean(arr){ let s=0; for (let i=0;i<arr.length;i++) s+=arr[i]; return s/arr.length; }
+function sd(arr, m){ if (m===undefined) m=mean(arr); let s=0; for (let i=0;i<arr.length;i++){const d=arr[i]-m; s+=d*d;} return Math.sqrt(s/arr.length); }
+function corr(a,b){
+  const ma=mean(a), mb=mean(b); let sab=0, sa=0, sb=0;
+  for (let i=0;i<a.length;i++){ const da=a[i]-ma, db=b[i]-mb; sab+=da*db; sa+=da*da; sb+=db*db; }
+  return sab / Math.sqrt(sa*sb || 1e-24);
+}
+function fmt(x, d){ if (x===undefined||x===null||Number.isNaN(x)) return "—"; d = d===undefined?4:d; return x.toFixed(d); }
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+
+/* ---------------------------------------------------------------------
+   3. Estado global de la aplicación
+   --------------------------------------------------------------------- */
+const VARLABEL = { X1:"X₁", X2:"X₂", Z:"Z" };
+const state = {
+  pop: null,            // { N, X1,X2,Z,U,Y (Float64Array), stats:{...} }
+  popRegression: null,  // { selectedVars, beta, invXtX, sigma2, R2 } sobre TODA la población
+  selectedVars: ["X1","X2"],
+  idxBuffer: null,      // Int32Array [0..N-1], se baraja parcialmente en cada muestreo
+  current: null,        // muestra vigente { idx, n, selectedVars, beta, invXtX, sigma2, se, R2, SER, xRanges }
+  mc: null,             // resultados Monte Carlo { selectedVars, n, R, betas:[R][k], meanBeta, sdBeta, seTheorMean, elapsedMs }
+  pinnedLines: [],       // [{x:[x0,x1], y:[y0,y1], xVar}]
+  ui: {
+    axisPair: null,      // para panel 3D cuando hay 3 regresores: [varA, varB]
+    xAxis2D: null,
+    encodeVar2D: null,
+    encodeMode2D: "color",
+    histA: null,
+    histB: null,
+    coordX: null,
+    coordY: null,
+  }
+};
+
+/* ---------------------------------------------------------------------
+   4. Generación de la población
+   --------------------------------------------------------------------- */
+function rescale(raw, targetMean, targetSd){
+  const n = raw.length;
+  const m = mean(raw), s = sd(raw, m) || 1e-9;
+  const out = new Float64Array(n);
+  for (let i=0;i<n;i++) out[i] = targetMean + targetSd * (raw[i]-m)/s;
+  return out;
+}
+function familyTransform(z, family){
+  // z: normal estándar de partida. Devuelve una variable con la forma deseada
+  // (se reestandariza empíricamente después, por lo que sólo importa la FORMA).
+  if (family === "normal") return z;
+  // familia "skew": introduce asimetría (expansión tipo Gram–Charlier / log-normal moderada)
+  return Math.exp(0.75 * z);
+}
+function errorFamilyTransform(z, family){
+  if (family === "normal") return z;
+  return z + 0.6 * (z*z - 1); // asimetría hacia la derecha, conserva media finita
+}
+
+function readConfig(){
+  return {
+    beta: [ +document.getElementById("beta0").value, +document.getElementById("beta1").value,
+            +document.getElementById("beta2").value, +document.getElementById("beta3").value ],
+    x1dist: document.getElementById("x1dist").value,
+    x1mu: +document.getElementById("x1mu").value,
+    x1sigma: Math.max(0.05, +document.getElementById("x1sigma").value),
+    x2dist: document.getElementById("x2dist").value,
+    x2mu: +document.getElementById("x2mu").value,
+    x2sigma: Math.max(0.05, +document.getElementById("x2sigma").value),
+    rhoX: clamp(+document.getElementById("rhoX").value, -0.97, 0.97),
+    uMu: +document.getElementById("uMu").value,
+    uSigma: Math.max(0.05, +document.getElementById("uSigma").value),
+    uDist: document.getElementById("uDist").value,
+    rhoU1: +document.getElementById("rhoU1").value,
+    rhoU2: +document.getElementById("rhoU2").value,
+    hetero: document.getElementById("hetero").checked,
+    heteroGamma: +document.getElementById("heteroGamma").value,
+    Npop: clamp(Math.round(+document.getElementById("Npop").value), 20000, 500000),
+    seed: Math.round(+document.getElementById("seed").value) || 1,
+  };
+}
+
+function generatePopulation(){
+  const cfg = readConfig();
+  const N = cfg.Npop;
+  const rng = mulberry32(cfg.seed);
+  const nrm = makeNormalRng(rng);
+
+  // normaliza correlaciones del error para evitar varianza residual negativa
+  let ru1 = cfg.rhoU1, ru2 = cfg.rhoU2;
+  const ss = ru1*ru1 + ru2*ru2;
+  if (ss > 0.95){ const f = Math.sqrt(0.95/ss); ru1*=f; ru2*=f; }
+
+  const Za = new Float64Array(N), Zb = new Float64Array(N);
+  const X1raw = new Float64Array(N), X2raw = new Float64Array(N), Uraw = new Float64Array(N);
+  const Z = new Float64Array(N);
+
+  for (let i=0;i<N;i++){
+    const za = nrm(), zb = nrm(), zc = nrm();
+    Za[i]=za; Zb[i]=zb;
+    const zx1 = za;
+    const zx2 = cfg.rhoX*za + Math.sqrt(1-cfg.rhoX*cfg.rhoX)*zb;
+    X1raw[i] = familyTransform(zx1, cfg.x1dist);
+    X2raw[i] = familyTransform(zx2, cfg.x2dist);
+    const rem = Math.max(1e-6, 1 - ru1*ru1 - ru2*ru2);
+    const zu = ru1*za + ru2*zb + Math.sqrt(rem)*zc;
+    Uraw[i] = errorFamilyTransform(zu, cfg.uDist);
+    Z[i] = rng() < 0.5 ? 0 : 1;
+  }
+
+  const X1 = rescale(X1raw, cfg.x1mu, cfg.x1sigma);
+  const X2 = rescale(X2raw, cfg.x2mu, cfg.x2sigma);
+  let Ustd = rescale(Uraw, 0, 1); // media 0, sd 1 provisional
+
+  const X1std = new Float64Array(N);
+  { const m1 = mean(X1), s1 = sd(X1,m1)||1e-9; for (let i=0;i<N;i++) X1std[i] = (X1[i]-m1)/s1; }
+
+  const U = new Float64Array(N);
+  for (let i=0;i<N;i++){
+    let ui = Ustd[i];
+    if (cfg.hetero){ ui *= (1 + cfg.heteroGamma * Math.abs(X1std[i])); }
+    U[i] = cfg.uMu + cfg.uSigma * ui;
+  }
+
+  const Y = new Float64Array(N);
+  for (let i=0;i<N;i++) Y[i] = cfg.beta[0] + cfg.beta[1]*X1[i] + cfg.beta[2]*X2[i] + cfg.beta[3]*Z[i] + U[i];
+
+  const stats = {
+    X1:{mean:mean(X1), sd:sd(X1), min:minArr(X1), max:maxArr(X1)},
+    X2:{mean:mean(X2), sd:sd(X2), min:minArr(X2), max:maxArr(X2)},
+    Z:{mean:mean(Z), sd:sd(Z), min:0, max:1},
+    U:{mean:mean(U), sd:sd(U)},
+    Y:{mean:mean(Y), sd:sd(Y)},
+    corrX1X2: corr(X1,X2),
+    corrUX1: corr(U,X1),
+    corrUX2: corr(U,X2),
+  };
+
+  state.pop = { N, X1, X2, Z, U, Y, cfg, stats };
+  state.idxBuffer = new Int32Array(N);
+  for (let i=0;i<N;i++) state.idxBuffer[i] = i;
+  state.current = null;
+  state.mc = null;
+  state.pinnedLines = [];
+
+  recomputePopulationRegression();
+  refreshAssumptionBadges(cfg);
+  renderPopStatus();
+  enableSamplingControls(true);
+  renderAllEmpty();
+}
+function minArr(a){ let m=Infinity; for (let i=0;i<a.length;i++) if(a[i]<m) m=a[i]; return m; }
+function maxArr(a){ let m=-Infinity; for (let i=0;i<a.length;i++) if(a[i]>m) m=a[i]; return m; }
+
+/* ---------------------------------------------------------------------
+   5. Muestreo sin reemplazo (Fisher–Yates parcial, O(n))
+   --------------------------------------------------------------------- */
+function drawSampleIndices(n, rng){
+  const buf = state.idxBuffer;
+  const N = buf.length;
+  n = Math.min(n, N);
+  for (let i=0;i<n;i++){
+    const j = i + Math.floor(rng() * (N - i));
+    const tmp = buf[i]; buf[i] = buf[j]; buf[j] = tmp;
+  }
+  return buf.subarray(0, n);
+}
+
+/* ---------------------------------------------------------------------
+   6. Ajuste MCO
+   --------------------------------------------------------------------- */
+function fitOLSFromIndices(idx, selectedVars, pop, wantInverse){
+  const k = 1 + selectedVars.length;
+  const cols = selectedVars.map(v => pop[v]);
+  const n = idx.length;
+  const XtX = Array.from({length:k}, () => new Float64Array(k));
+  const XtY = new Float64Array(k);
+  const row = new Float64Array(k);
+  for (let t=0;t<n;t++){
+    const i = idx[t];
+    row[0] = 1;
+    for (let c=0;c<selectedVars.length;c++) row[c+1] = cols[c][i];
+    const yi = pop.Y[i];
+    for (let a=0;a<k;a++){
+      XtY[a] += row[a]*yi;
+      const Xa = row[a];
+      const XtXa = XtX[a];
+      for (let b=a;b<k;b++) XtXa[b] += Xa*row[b];
+    }
+  }
+  for (let a=0;a<k;a++) for (let b=0;b<a;b++) XtX[a][b] = XtX[b][a];
+
+  const XtXarr = XtX.map(r => Array.from(r));
+  const beta = gaussSolve(XtXarr, Array.from(XtY));
+
+  // suma de cuadrados residuales
+  let ssr = 0, ybar = 0;
+  for (let t=0;t<n;t++) ybar += pop.Y[idx[t]];
+  ybar /= n;
+  let sst = 0;
+  for (let t=0;t<n;t++){
+    const i = idx[t];
+    let yhat = beta[0];
+    for (let c=0;c<selectedVars.length;c++) yhat += beta[c+1]*cols[c][i];
+    const e = pop.Y[i]-yhat;
+    ssr += e*e;
+    const d = pop.Y[i]-ybar;
+    sst += d*d;
+  }
+  const dof = Math.max(1, n-k);
+  const sigma2 = ssr/dof;
+  const R2 = sst>1e-12 ? 1 - ssr/sst : NaN;
+
+  let invXtX = null, se = null;
+  if (wantInverse){
+    invXtX = invertMatrix(XtXarr);
+    se = invXtX.map((r,i)=>Math.sqrt(Math.max(0,sigma2*r[i])));
+  }
+  return { beta, n, k, sigma2, R2, SER:Math.sqrt(sigma2), ssr, invXtX, se, selectedVars: selectedVars.slice() };
+}
+
+function recomputePopulationRegression(){
+  if (!state.pop) return;
+  const idxAll = new Int32Array(state.pop.N);
+  for (let i=0;i<idxAll.length;i++) idxAll[i]=i;
+  state.popRegression = fitOLSFromIndices(idxAll, state.selectedVars, state.pop, true);
+}
+
+/* ---------------------------------------------------------------------
+   7. Selección de regresores / variables seleccionadas
+   --------------------------------------------------------------------- */
+function getSelectedVars(){
+  const vars = [];
+  if (document.getElementById("regX1").checked) vars.push("X1");
+  if (document.getElementById("regX2").checked) vars.push("X2");
+  if (document.getElementById("regZ").checked) vars.push("Z");
+  return vars;
+}
+function enforceAtLeastOneRegressor(changedId){
+  const boxes = ["regX1","regX2","regZ"].map(id=>document.getElementById(id));
+  const checked = boxes.filter(b=>b.checked);
+  if (checked.length === 0){
+    document.getElementById(changedId).checked = true;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   8. Extracción de una muestra individual (paneles 3D / 2D)
+   --------------------------------------------------------------------- */
+function drawNewSample(){
+  if (!state.pop) return;
+  const n = +document.getElementById("nSize").value;
+  const rng = mulberry32((Math.random()*1e9)|0); // aleatoriedad de la extracción (independiente de la semilla poblacional)
+  const idx = drawSampleIndices(n, rng);
+  const idxCopy = Int32Array.from(idx);
+  const selectedVars = getSelectedVars();
+  const fit = fitOLSFromIndices(idxCopy, selectedVars, state.pop, true);
+
+  state.current = { idx: idxCopy, n, selectedVars, ...fit };
+  state.selectedVars = selectedVars;
+  if (state.pinnedLines.length && state.pinnedLines[0].varsKey !== selectedVars.join(",")){
+    state.pinnedLines = []; // las rectas fijadas ya no son comparables
+  }
+  ensureUISelections();
+  renderCurrentSamplePanels();
+  renderCurrentTable();
+  document.getElementById("pinLineBtn").disabled = false;
+  document.getElementById("sampleStatus").textContent = `Muestra de n=${n} extraída (β̂ calculado).`;
+}
+
+/* ---------------------------------------------------------------------
+   9. Simulación Monte Carlo (paneles inferiores)
+   --------------------------------------------------------------------- */
+function runMonteCarlo(){
+  if (!state.pop) return;
+  const n = +document.getElementById("nSize").value;
+  const R = clamp(Math.round(+document.getElementById("Rreps").value), 10, 2000);
+  const selectedVars = getSelectedVars();
+  const k = 1 + selectedVars.length;
+  const t0 = performance.now();
+
+  const betas = Array.from({length:R}, () => new Float64Array(k));
+  let seTheorSum = new Float64Array(k);
+  let sigma2Sum = 0;
+  const rng = mulberry32((Math.random()*1e9)|0);
+
+  for (let r=0;r<R;r++){
+    const idx = drawSampleIndices(n, rng);
+    const fit = fitOLSFromIndices(idx, selectedVars, state.pop, true);
+    betas[r].set(fit.beta);
+    sigma2Sum += fit.sigma2;
+    for (let a=0;a<k;a++) seTheorSum[a] += fit.se[a];
+  }
+
+  const meanBeta = new Float64Array(k), sdBeta = new Float64Array(k), seTheorMean = new Float64Array(k);
+  for (let a=0;a<k;a++){
+    const col = betas.map(b=>b[a]);
+    meanBeta[a] = mean(col);
+    sdBeta[a] = sd(col, meanBeta[a]);
+    seTheorMean[a] = seTheorSum[a]/R;
+  }
+
+  state.mc = { selectedVars: selectedVars.slice(), n, R, k, betas, meanBeta, sdBeta, seTheorMean,
+               elapsedMs: performance.now()-t0 };
+  state.selectedVars = selectedVars;
+  ensureUISelections();
+  renderHistPanels();
+  renderCoordPanel();
+  renderMCTable();
+  document.getElementById("sampleStatus").textContent = `Monte Carlo: R=${R} muestras de n=${n} (${state.mc.elapsedMs.toFixed(0)} ms).`;
+}
+
+/* ---------------------------------------------------------------------
+   10. Selecciones dependientes de la UI (dropdowns de paneles)
+   --------------------------------------------------------------------- */
+function coeffLabels(selectedVars){
+  return ["β₀ (intercepto)", ...selectedVars.map(v => `β (${VARLABEL[v]})`)];
+}
+function ensureUISelections(){
+  const vars = state.selectedVars;
+  // Panel 3D: si hay >=2 regresores, elegir par por defecto
+  if (vars.length >= 2){
+    if (!state.ui.axisPair || !state.ui.axisPair.every(v=>vars.includes(v))){
+      state.ui.axisPair = [vars[0], vars[1]];
+    }
+  } else { state.ui.axisPair = null; }
+
+  // Panel 2D
+  if (!vars.includes(state.ui.xAxis2D)) state.ui.xAxis2D = vars[0];
+  const others = vars.filter(v => v!==state.ui.xAxis2D);
+  if (!others.includes(state.ui.encodeVar2D)) state.ui.encodeVar2D = others[0] || null;
+  if (state.ui.encodeVar2D === "Z") state.ui.encodeMode2D = "color";
+
+  // Histogramas / coordenadas
+  const coeffKeys = ["b0", ...vars]; // b0 = intercepto
+  if (!coeffKeys.includes(state.ui.histA)) state.ui.histA = vars[0] || "b0";
+  if (!coeffKeys.includes(state.ui.histB)) state.ui.histB = vars[1] || (vars[0]==="b0"?null:"b0");
+  if (!coeffKeys.includes(state.ui.coordX)) state.ui.coordX = vars[0] || "b0";
+  if (!coeffKeys.includes(state.ui.coordY)) state.ui.coordY = vars[1] || "b0";
+
+  buildPanelControls();
+}
+
+function coeffIndex(key, selectedVars){
+  if (key === "b0") return 0;
+  return 1 + selectedVars.indexOf(key);
+}
+function coeffLabel(key){
+  return key === "b0" ? "β₀" : `β(${VARLABEL[key]})`;
+}
+
+function buildPanelControls(){
+  const vars = state.selectedVars;
+  const coeffKeys = ["b0", ...vars];
+
+  // --- 3D ---
+  const c3 = document.getElementById("panel3dControls");
+  c3.innerHTML = "";
+  if (vars.length >= 2){
+    const sel = document.createElement("select");
+    for (const combo of pairCombinations(vars)){
+      const opt = document.createElement("option");
+      opt.value = combo.join(",");
+      opt.textContent = `${VARLABEL[combo[0]]} × ${VARLABEL[combo[1]]}`;
+      if (state.ui.axisPair && combo[0]===state.ui.axisPair[0] && combo[1]===state.ui.axisPair[1]) opt.selected = true;
+      sel.appendChild(opt);
+    }
+    sel.addEventListener("change", ()=>{ state.ui.axisPair = sel.value.split(","); renderCurrentSamplePanels(); });
+    if (vars.length > 2){
+      const lab = document.createElement("span"); lab.className="mini-label"; lab.textContent="Par de ejes:";
+      c3.appendChild(lab);
+    }
+    c3.appendChild(sel);
+  }
+
+  // --- 2D ---
+  const c2 = document.getElementById("panel2dControls");
+  c2.innerHTML = "";
+  const labX = document.createElement("span"); labX.className="mini-label"; labX.textContent="Eje X:";
+  const selX = document.createElement("select");
+  vars.forEach(v=>{ const o=document.createElement("option"); o.value=v; o.textContent=VARLABEL[v]; if(v===state.ui.xAxis2D) o.selected=true; selX.appendChild(o); });
+  selX.addEventListener("change", ()=>{ state.ui.xAxis2D = selX.value; state.pinnedLines=[]; ensureUISelections(); renderCurrentSamplePanels(); });
+  c2.appendChild(labX); c2.appendChild(selX);
+
+  const others = vars.filter(v=>v!==state.ui.xAxis2D);
+  if (others.length){
+    const labE = document.createElement("span"); labE.className="mini-label"; labE.textContent="Codificar:";
+    const selE = document.createElement("select");
+    others.forEach(v=>{ const o=document.createElement("option"); o.value=v; o.textContent=VARLABEL[v]; if(v===state.ui.encodeVar2D) o.selected=true; selE.appendChild(o); });
+    selE.addEventListener("change", ()=>{ state.ui.encodeVar2D = selE.value; if(selE.value==="Z") state.ui.encodeMode2D="color"; buildPanelControls(); renderCurrentSamplePanels(); });
+    c2.appendChild(labE); c2.appendChild(selE);
+
+    if (state.ui.encodeVar2D !== "Z"){
+      const selM = document.createElement("select");
+      ["color","tamaño"].forEach(m=>{ const o=document.createElement("option"); o.value=(m==="color"?"color":"size"); o.textContent=m; if((m==="color"?"color":"size")===state.ui.encodeMode2D) o.selected=true; selM.appendChild(o); });
+      selM.addEventListener("change", ()=>{ state.ui.encodeMode2D = selM.value; renderCurrentSamplePanels(); });
+      c2.appendChild(selM);
+    }
+  }
+
+  // --- Histogramas ---
+  buildCoeffSelect("histAControls", "Coeficiente:", coeffKeys, state.ui.histA, v=>{ state.ui.histA=v; renderHistPanels(); });
+  buildCoeffSelect("histBControls", "Coeficiente:", coeffKeys, state.ui.histB, v=>{ state.ui.histB=v; renderHistPanels(); });
+  // --- Coordenadas ---
+  buildCoeffSelect("coordControls", "Eje X:", coeffKeys, state.ui.coordX, v=>{ state.ui.coordX=v; renderCoordPanel(); }, "coordX");
+  buildCoeffSelectAppend("coordControls", "Eje Y:", coeffKeys, state.ui.coordY, v=>{ state.ui.coordY=v; renderCoordPanel(); });
+}
+function pairCombinations(vars){
+  const out = [];
+  for (let i=0;i<vars.length;i++) for (let j=i+1;j<vars.length;j++) out.push([vars[i],vars[j]]);
+  return out;
+}
+function buildCoeffSelect(containerId, label, keys, current, onChange){
+  const c = document.getElementById(containerId);
+  c.innerHTML = "";
+  const lab = document.createElement("span"); lab.className="mini-label"; lab.textContent=label;
+  const sel = document.createElement("select");
+  keys.forEach(k=>{ const o=document.createElement("option"); o.value=k; o.textContent=coeffLabel(k); if(k===current) o.selected=true; sel.appendChild(o); });
+  sel.addEventListener("change", ()=>onChange(sel.value));
+  c.appendChild(lab); c.appendChild(sel);
+}
+function buildCoeffSelectAppend(containerId, label, keys, current, onChange){
+  const c = document.getElementById(containerId);
+  const lab = document.createElement("span"); lab.className="mini-label"; lab.textContent=label; lab.style.marginLeft="6px";
+  const sel = document.createElement("select");
+  keys.forEach(k=>{ const o=document.createElement("option"); o.value=k; o.textContent=coeffLabel(k); if(k===current) o.selected=true; sel.appendChild(o); });
+  sel.addEventListener("change", ()=>onChange(sel.value));
+  c.appendChild(lab); c.appendChild(sel);
+}
+
+/* ---------------------------------------------------------------------
+   11. Tema para Plotly (lee variables CSS activas)
+   --------------------------------------------------------------------- */
+function plotlyColors(){
+  const cs = getComputedStyle(document.documentElement);
+  const g = (name) => cs.getPropertyValue(name).trim();
+  return {
+    ink: g("--ink"), inkMuted: g("--ink-muted"), border: g("--border"),
+    surface: g("--surface"), accent: g("--accent"), accent2: g("--accent-2"),
+    accent3: g("--accent-3"), good: g("--good"), bad: g("--bad"),
+  };
+}
+function setEmptyPlot(el, html){
+  // Libera correctamente el contexto WebGL de Plotly (scatter3d/surface) antes de
+  // destruir el contenido del contenedor; de lo contrario los contextos quedan
+  // huérfanos y, tras suficientes remuestreos, se agota el cupo de WebGL del navegador.
+  try { if (window.Plotly && el && el.data) Plotly.purge(el); } catch(e){}
+  el.innerHTML = html;
+}
+function baseLayout(extra){
+  const c = plotlyColors();
+  return Object.assign({
+    paper_bgcolor: c.surface, plot_bgcolor: c.surface,
+    font: { family: "IBM Plex Sans, sans-serif", color: c.inkMuted, size: 11 },
+    margin: { l: 46, r: 16, t: 10, b: 40 },
+    xaxis: { gridcolor: c.border, zerolinecolor: c.border, linecolor: c.border, tickfont:{color:c.inkMuted} },
+    yaxis: { gridcolor: c.border, zerolinecolor: c.border, linecolor: c.border, tickfont:{color:c.inkMuted} },
+    legend: { font: { color: c.inkMuted, size: 10 }, bgcolor: "rgba(0,0,0,0)" },
+    hoverlabel: { bgcolor: c.surface, bordercolor: c.border, font:{color:c.ink} },
+  }, extra || {});
+}
+const PLOTLY_CFG = { displayModeBar: false, responsive: true };
+
+/* ---------------------------------------------------------------------
+   12. Render: panel 3D + panel 2D (muestra vigente)
+   --------------------------------------------------------------------- */
+const MAX_DISPLAY_POINTS = 1500;
+function subsampleForDisplay(idx){
+  if (idx.length <= MAX_DISPLAY_POINTS) return idx;
+  const out = new Int32Array(MAX_DISPLAY_POINTS);
+  const step = idx.length / MAX_DISPLAY_POINTS;
+  for (let i=0;i<MAX_DISPLAY_POINTS;i++) out[i] = idx[Math.floor(i*step)];
+  return out;
+}
+
+function renderCurrentSamplePanels(){
+  renderPanel3D();
+  renderPanel2D();
+}
+
+function renderPanel3D(){
+  const el = document.getElementById("plot3d");
+  const note = document.getElementById("panel3dNote");
+  const sub = document.getElementById("panel3dSub");
+  const cur = state.current;
+  if (!cur || cur.selectedVars.length < 2){
+    setEmptyPlot(el, '<div class="empty-state">El panel 3D requiere al menos dos regresores seleccionados y una muestra extraída.</div>');
+    note.textContent = "—";
+    sub.textContent = "requiere ≥2 regresores";
+    return;
+  }
+  const [va, vb] = state.ui.axisPair || [cur.selectedVars[0], cur.selectedVars[1]];
+  sub.textContent = `Y vs. ${VARLABEL[va]} y ${VARLABEL[vb]}`;
+  const pop = state.pop;
+  const dispIdx = subsampleForDisplay(cur.idx);
+  const xs = Array.from(dispIdx, i=>pop[va][i]);
+  const ys = Array.from(dispIdx, i=>pop[vb][i]);
+  const zs = Array.from(dispIdx, i=>pop.Y[i]);
+
+  const scatter = {
+    type:"scatter3d", mode:"markers", x:xs, y:ys, z:zs,
+    marker:{ size:2.6, color: plotlyColors().accent, opacity:0.65 },
+    name:"muestra", hoverinfo:"skip",
+  };
+
+  // grilla para el plano ajustado
+  const rangeA = [pop.stats[va].min, pop.stats[va].max];
+  const rangeB = [pop.stats[vb].min, pop.stats[vb].max];
+  const G = 14;
+  const gx = Array.from({length:G}, (_,i)=> rangeA[0] + (rangeA[1]-rangeA[0])*i/(G-1));
+  const gy = Array.from({length:G}, (_,i)=> rangeB[0] + (rangeB[1]-rangeB[0])*i/(G-1));
+
+  // valor de las variables no graficadas fijado en su media muestral
+  const otherVars = cur.selectedVars.filter(v=>v!==va && v!==vb);
+  let otherContribution = 0;
+  otherVars.forEach(v=>{
+    const idxCoef = coeffIndex(v, cur.selectedVars);
+    const m = mean(Array.from(cur.idx, i=>pop[v][i]));
+    otherContribution += cur.beta[idxCoef]*m;
+  });
+  const bA = cur.beta[coeffIndex(va, cur.selectedVars)];
+  const bB = cur.beta[coeffIndex(vb, cur.selectedVars)];
+  const b0 = cur.beta[0];
+
+  const zGrid = gy.map(yv => gx.map(xv => b0 + bA*xv + bB*yv + otherContribution));
+
+  const surface = {
+    type:"surface", x:gx, y:gy, z:zGrid, showscale:false, opacity:0.55,
+    colorscale: [[0, plotlyColors().accent2],[1, plotlyColors().accent2]],
+    name:"plano MCO", hoverinfo:"skip",
+  };
+
+  const c = plotlyColors();
+  Plotly.react(el, [surface, scatter], baseLayout({
+    scene: {
+      xaxis:{ title:{text:VARLABEL[va]}, gridcolor:c.border, color:c.inkMuted, backgroundcolor:c.surface },
+      yaxis:{ title:{text:VARLABEL[vb]}, gridcolor:c.border, color:c.inkMuted, backgroundcolor:c.surface },
+      zaxis:{ title:{text:"Y (ordenada)"}, gridcolor:c.border, color:c.inkMuted, backgroundcolor:c.surface },
+      camera:{ eye:{x:1.5,y:-1.5,z:0.9} },
+    },
+    margin:{l:0,r:0,t:6,b:0},
+    showlegend:false,
+  }), PLOTLY_CFG);
+
+  const extra = otherVars.length ? ` (con ${otherVars.map(v=>VARLABEL[v]).join(", ")} fijada(s) en su media muestral)` : "";
+  note.textContent = `n=${cur.n} · se muestran hasta ${MAX_DISPLAY_POINTS} puntos por rendimiento; la estimación usa los ${cur.n} completos${extra}.`;
+}
+
+function renderPanel2D(){
+  const el = document.getElementById("plot2d");
+  const cur = state.current;
+  if (!cur){
+    setEmptyPlot(el, '<div class="empty-state">Extraiga una muestra para visualizar la dispersión y la recta de regresión.</div>');
+    return;
+  }
+  const pop = state.pop;
+  const xVar = state.ui.xAxis2D;
+  const encVar = state.ui.encodeVar2D;
+  const dispIdx = subsampleForDisplay(cur.idx);
+  const c = plotlyColors();
+  const traces = [];
+
+  if (encVar === "Z"){
+    [0,1].forEach(zval=>{
+      const sel = Array.from(dispIdx).filter(i=>pop.Z[i]===zval);
+      traces.push({
+        type:"scatter", mode:"markers", x: sel.map(i=>pop[xVar][i]), y: sel.map(i=>pop.Y[i]),
+        marker:{ size:6, color: zval===0? c.accent : c.accent3, opacity:0.6 },
+        name:`Z=${zval}`,
+      });
+    });
+  } else if (encVar){
+    const vals = Array.from(dispIdx, i=>pop[encVar][i]);
+    if (state.ui.encodeMode2D === "size"){
+      const vmin = Math.min(...vals), vmax = Math.max(...vals);
+      const sizes = vals.map(v => 4 + 14*( (v-vmin) / ((vmax-vmin)||1) ));
+      traces.push({
+        type:"scatter", mode:"markers", x: Array.from(dispIdx,i=>pop[xVar][i]), y: Array.from(dispIdx,i=>pop.Y[i]),
+        marker:{ size: sizes, color: c.accent, opacity:0.5, line:{width:0} },
+        name:"muestra", text: vals.map(v=>`${VARLABEL[encVar]}=${fmt(v,2)}`), hovertemplate:"%{text}<extra></extra>",
+      });
+    } else {
+      traces.push({
+        type:"scatter", mode:"markers", x: Array.from(dispIdx,i=>pop[xVar][i]), y: Array.from(dispIdx,i=>pop.Y[i]),
+        marker:{ size:6, color: vals, colorscale: [[0,c.accent],[1,c.accent2]], opacity:0.65, showscale:true,
+                 colorbar:{ title:{text:VARLABEL[encVar], font:{size:10,color:c.inkMuted}}, tickfont:{size:9,color:c.inkMuted}, thickness:10, len:0.75 } },
+        name:"muestra",
+      });
+    }
+  } else {
+    traces.push({
+      type:"scatter", mode:"markers", x: Array.from(dispIdx,i=>pop[xVar][i]), y: Array.from(dispIdx,i=>pop.Y[i]),
+      marker:{ size:6, color:c.accent, opacity:0.6 }, name:"muestra",
+    });
+  }
+
+  // recta ajustada (parcial: otras variables en su media muestral)
+  const range = [pop.stats[xVar].min, pop.stats[xVar].max];
+  const bX = cur.beta[coeffIndex(xVar, cur.selectedVars)];
+  const otherVars = cur.selectedVars.filter(v=>v!==xVar);
+  let otherContribution = 0;
+  otherVars.forEach(v=>{
+    const idxCoef = coeffIndex(v, cur.selectedVars);
+    const m = mean(Array.from(cur.idx, i=>pop[v][i]));
+    otherContribution += cur.beta[idxCoef]*m;
+  });
+  const b0 = cur.beta[0];
+  const lineY = range.map(xv => b0 + bX*xv + otherContribution);
+
+  state.pinnedLines.forEach(pl=>{
+    traces.push({ type:"scatter", mode:"lines", x:pl.x, y:pl.y, line:{color:c.accent2, width:1.4}, opacity:0.32, hoverinfo:"skip", showlegend:false });
+  });
+
+  traces.push({ type:"scatter", mode:"lines", x:range, y:lineY, line:{color:c.accent2, width:3}, name:"recta MCO (muestra vigente)" });
+
+  Plotly.react(el, traces, baseLayout({
+    xaxis: { title: {text:VARLABEL[xVar]}, gridcolor:c.border, zerolinecolor:c.border, tickfont:{color:c.inkMuted} },
+    yaxis: { title: {text:"Y"}, gridcolor:c.border, zerolinecolor:c.border, tickfont:{color:c.inkMuted} },
+    showlegend:true, legend:{orientation:"h", y:1.12, font:{size:9,color:c.inkMuted}, bgcolor:"rgba(0,0,0,0)"},
+    margin:{l:50,r:14,t:26,b:40},
+  }), PLOTLY_CFG);
+
+  document.getElementById("pinCount").textContent = String(state.pinnedLines.length);
+  window.__lastLine2D = { x:range, y:lineY, xVar, varsKey: cur.selectedVars.join(",") };
+}
+
+function pinCurrentLine(){
+  if (!window.__lastLine2D) return;
+  state.pinnedLines.push(Object.assign({}, window.__lastLine2D));
+  document.getElementById("clearPinsBtn").disabled = false;
+  renderPanel2D();
+}
+function clearPinnedLines(){
+  state.pinnedLines = [];
+  document.getElementById("clearPinsBtn").disabled = true;
+  renderPanel2D();
+}
+
+/* ---------------------------------------------------------------------
+   13. Render: histogramas + panel de coordenadas (Monte Carlo)
+   --------------------------------------------------------------------- */
+function normalPdf(x, m, s){ return Math.exp(-0.5*Math.pow((x-m)/s,2)) / (s*Math.sqrt(2*Math.PI)); }
+
+function renderOneHist(elId, key){
+  const el = document.getElementById(elId);
+  const mc = state.mc;
+  if (!mc || !key){ setEmptyPlot(el, '<div class="empty-state">Ejecute la simulación Monte Carlo.</div>'); return; }
+  const idx = coeffIndex(key, mc.selectedVars);
+  const vals = mc.betas.map(b=>b[idx]);
+  const m = mc.meanBeta[idx], s = mc.sdBeta[idx];
+  const trueVal = truePopParam(key);
+  const popVal = mc.selectedVars.length===state.popRegression.selectedVars.length ? state.popRegression.beta[idx] : null;
+  const c = plotlyColors();
+
+  const nBins = Math.max(10, Math.min(40, Math.round(Math.sqrt(mc.R)*1.6)));
+  const vmin = Math.min(...vals), vmax = Math.max(...vals);
+  const binWidth = (vmax-vmin)/nBins || 1;
+
+  const histTrace = { type:"histogram", x:vals, nbinsx:nBins, marker:{color:c.accent, opacity:0.7, line:{color:c.surface,width:1}}, name:"β̂ (Monte Carlo)" };
+
+  const xs = []; const N_CURVE=120;
+  for (let i=0;i<=N_CURVE;i++) xs.push(vmin - 0.15*(vmax-vmin) + (1.3*(vmax-vmin))*i/N_CURVE);
+  const ys = xs.map(x => normalPdf(x,m,s) * mc.R * binWidth);
+  const curveTrace = { type:"scatter", mode:"lines", x:xs, y:ys, line:{color:c.accent2,width:2}, name:"ajuste normal (TLC empírico)" };
+
+  const shapes = [];
+  if (popVal !== null) shapes.push({ type:"line", x0:popVal, x1:popVal, y0:0, y1:1, yref:"paper", line:{color:c.bad, width:2, dash:"dash"} });
+
+  Plotly.react(el, [histTrace, curveTrace], baseLayout({
+    xaxis:{ title: {text:coeffLabel(key)}, gridcolor:c.border, tickfont:{color:c.inkMuted} },
+    yaxis:{ title:{text:"frecuencia"}, gridcolor:c.border, tickfont:{color:c.inkMuted} },
+    shapes, showlegend:true, legend:{orientation:"h", y:1.16, font:{size:9,color:c.inkMuted}, bgcolor:"rgba(0,0,0,0)"},
+    margin:{l:44,r:12,t:24,b:36},
+  }), PLOTLY_CFG);
+}
+function truePopParam(key){
+  if (!state.pop) return null;
+  const beta = state.pop.cfg.beta;
+  if (key==="b0") return beta[0];
+  if (key==="X1") return beta[1];
+  if (key==="X2") return beta[2];
+  if (key==="Z") return beta[3];
+  return null;
+}
+function renderHistPanels(){ renderOneHist("plotHistA", state.ui.histA); renderOneHist("plotHistB", state.ui.histB); }
+
+function renderCoordPanel(){
+  const el = document.getElementById("plotCoords");
+  const mc = state.mc;
+  if (!mc){ setEmptyPlot(el, '<div class="empty-state">Ejecute la simulación Monte Carlo.</div>'); return; }
+  const kx = state.ui.coordX, ky = state.ui.coordY;
+  const ix = coeffIndex(kx, mc.selectedVars), iy = coeffIndex(ky, mc.selectedVars);
+  const xs = mc.betas.map(b=>b[ix]), ys = mc.betas.map(b=>b[iy]);
+  const c = plotlyColors();
+
+  const cloud = { type:"scatter", mode:"markers", x:xs, y:ys, marker:{size:5, color:c.accent, opacity:0.35}, name:"β̂ (r-ésima muestra)" };
+
+  const meanPt = { type:"scatter", mode:"markers", x:[mean(xs)], y:[mean(ys)],
+    marker:{ symbol:"diamond", size:12, color:c.accent, line:{color:c.surface,width:1.5} }, name:"media de las estimaciones" };
+
+  const traces = [cloud];
+  const ellipse = confidenceEllipse(xs, ys, mean(xs), mean(ys));
+  if (ellipse) traces.push({ type:"scatter", mode:"lines", x:ellipse.x, y:ellipse.y, line:{color:c.accent, width:1.4, dash:"dot"}, name:"elipse ~95% (empírica)" });
+  traces.push(meanPt);
+
+  const popEqual = mc.selectedVars.length === state.popRegression.selectedVars.length;
+  if (popEqual){
+    const px = state.popRegression.beta[ix], py = state.popRegression.beta[iy];
+    traces.push({ type:"scatter", mode:"markers", x:[px], y:[py],
+      marker:{ symbol:"star", size:16, color:c.accent2, line:{color:c.surface,width:1} }, name:"β poblacional (MCO, N completa)" });
+  }
+  const tx = truePopParam(kx), ty = truePopParam(ky);
+  if (tx!==null && ty!==null){
+    traces.push({ type:"scatter", mode:"markers", x:[tx], y:[ty],
+      marker:{ symbol:"cross", size:13, color:c.bad, line:{width:0} }, name:"β estructural (PGD)" });
+  }
+
+  Plotly.react(el, traces, baseLayout({
+    xaxis:{ title: {text:coeffLabel(kx)}, gridcolor:c.border, tickfont:{color:c.inkMuted} },
+    yaxis:{ title: {text:coeffLabel(ky)}, gridcolor:c.border, tickfont:{color:c.inkMuted} },
+    showlegend:true, legend:{orientation:"h", y:1.22, font:{size:8.5,color:c.inkMuted}, bgcolor:"rgba(0,0,0,0)"},
+    margin:{l:48,r:12,t:36,b:36},
+  }), PLOTLY_CFG);
+}
+function confidenceEllipse(xs, ys, mx, my){
+  const n = xs.length; if (n<3) return null;
+  let sxx=0, syy=0, sxy=0;
+  for (let i=0;i<n;i++){ const dx=xs[i]-mx, dy=ys[i]-my; sxx+=dx*dx; syy+=dy*dy; sxy+=dx*dy; }
+  sxx/=n; syy/=n; sxy/=n;
+  const tr = sxx+syy, det = sxx*syy - sxy*sxy;
+  const disc = Math.sqrt(Math.max(0, tr*tr/4 - det));
+  const l1 = tr/2 + disc, l2 = tr/2 - disc;
+  let vx=sxy, vy=l1-sxx;
+  if (Math.abs(vx)<1e-12 && Math.abs(vy)<1e-12){ vx=1; vy=0; }
+  const vlen = Math.hypot(vx,vy)||1; vx/=vlen; vy/=vlen;
+  const chi2_95 = 5.991;
+  const a = Math.sqrt(Math.max(0,l1)*chi2_95), b = Math.sqrt(Math.max(0,l2)*chi2_95);
+  const pts = 60, X=[], Y=[];
+  for (let i=0;i<=pts;i++){
+    const t = 2*Math.PI*i/pts;
+    const ex = a*Math.cos(t), ey = b*Math.sin(t);
+    X.push(mx + ex*vx - ey*vy);
+    Y.push(my + ex*vy + ey*vx);
+  }
+  return { x:X, y:Y };
+}
+
+/* ---------------------------------------------------------------------
+   14. Tablas resumen
+   --------------------------------------------------------------------- */
+function renderCurrentTable(){
+  const wrap = document.getElementById("currentTableWrap");
+  const cur = state.current;
+  if (!cur){ wrap.innerHTML = '<div class="table-empty">Sin muestra extraída.</div>'; return; }
+  const keys = ["b0", ...cur.selectedVars];
+  let rows = keys.map((k,i)=>{
+    const trueV = truePopParam(k);
+    const popV = state.popRegression.beta[i];
+    const t = cur.se[i] ? cur.beta[i]/cur.se[i] : NaN;
+    return `<tr>
+      <td>${coeffLabel(k)}</td>
+      <td class="mono">${fmt(cur.beta[i])}</td>
+      <td class="mono">${fmt(cur.se[i])}</td>
+      <td class="mono">${fmt(t,2)}</td>
+      <td class="mono">${fmt(popV)}</td>
+      <td class="mono">${trueV===null?"—":fmt(trueV)}</td>
+    </tr>`;
+  }).join("");
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Coeficiente</th><th>β̂ (muestra)</th><th>EE (homoc.)</th><th>t</th><th>β poblacional</th><th>β estructural</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div style="padding:8px 12px;font-size:11px;color:var(--ink-faint);border-top:1px solid var(--border);">
+    n=${cur.n} · R²=${fmt(cur.R2,3)} · SER=${fmt(cur.SER)} · EE calculado bajo el supuesto de homocedasticidad (MLR.5).
+  </div>`;
+}
+
+function renderMCTable(){
+  const wrap = document.getElementById("mcTableWrap");
+  const mc = state.mc;
+  if (!mc){ wrap.innerHTML = '<div class="table-empty">Sin simulación ejecutada.</div>'; return; }
+  const keys = ["b0", ...mc.selectedVars];
+  const popEqual = mc.selectedVars.length === state.popRegression.selectedVars.length;
+  let rows = keys.map((k,i)=>{
+    const trueV = truePopParam(k);
+    const target = popEqual ? state.popRegression.beta[i] : null;
+    const bias = target!==null ? mc.meanBeta[i]-target : null;
+    const flag = (bias!==null && Math.abs(bias) > 0.3*mc.sdBeta[i] && Math.abs(bias) > 1e-6)
+      ? `<span class="flag bad">sesgo aparente</span>` : "";
+    return `<tr>
+      <td>${coeffLabel(k)}${flag}</td>
+      <td class="mono">${fmt(mc.meanBeta[i])}</td>
+      <td class="mono">${target===null?"—":fmt(target)}</td>
+      <td class="mono">${bias===null?"—":fmt(bias)}</td>
+      <td class="mono">${fmt(mc.sdBeta[i])}</td>
+      <td class="mono">${fmt(mc.seTheorMean[i])}</td>
+    </tr>`;
+  }).join("");
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Coeficiente</th><th>Media(β̂)</th><th>β poblacional</th><th>Sesgo</th><th>DE Monte Carlo</th><th>EE teórico prom.</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div style="padding:8px 12px;font-size:11px;color:var(--ink-faint);border-top:1px solid var(--border);">
+    R=${mc.R} repeticiones · n=${mc.n} · DE Monte Carlo ≈ EE teórico ⇒ la fórmula clásica de varianza es válida (homocedasticidad); una brecha sistemática delata heterocedasticidad (MLR.5).
+  </div>`;
+}
+
+/* ---------------------------------------------------------------------
+   15. Insignias de los cinco supuestos
+   --------------------------------------------------------------------- */
+function pillHTML(kind, text){
+  return `<span class="pill ${kind}"><span class="dot"></span>${text}</span>`;
+}
+function refreshAssumptionBadges(cfg){
+  const vars = getSelectedVars();
+
+  // MLR.3 — no colinealidad perfecta
+  const a3 = document.getElementById("assump3");
+  if (vars.includes("X1") && vars.includes("X2")){
+    const rho = Math.abs(cfg.rhoX);
+    let kind="ok", txt="Se cumple";
+    if (rho>=0.9){kind="bad"; txt="Casi violado (ρ≥0.90)";}
+    else if (rho>=0.6){kind="warn"; txt="Alerta: colinealidad alta";}
+    a3.querySelector(".pill").outerHTML = pillHTML(kind, txt);
+    a3.querySelector(".detail").textContent = `ρ(X₁,X₂) nominal = ${fmt(cfg.rhoX,2)}; realizada ≈ ${state.pop?fmt(state.pop.stats.corrX1X2,2):"—"}.`;
+  } else {
+    a3.querySelector(".pill").outerHTML = pillHTML("na", "No aplica");
+    a3.querySelector(".detail").textContent = "Requiere X₁ y X₂ simultáneamente en el modelo estimado.";
+  }
+
+  // MLR.4 — media condicional nula
+  const a4 = document.getElementById("assump4");
+  const violated4 = Math.abs(cfg.uMu) > 1e-9 || Math.abs(cfg.rhoU1) > 1e-9 || Math.abs(cfg.rhoU2) > 1e-9;
+  a4.querySelector(".pill").outerHTML = pillHTML(violated4?"bad":"ok", violated4?"Violado":"Se cumple");
+  a4.querySelector(".detail").textContent = `μ(u)=${fmt(cfg.uMu,2)} · Corr(u,X₁)≈${fmt(cfg.rhoU1,2)} · Corr(u,X₂)≈${fmt(cfg.rhoU2,2)}.`;
+
+  // MLR.5 — homocedasticidad
+  const a5 = document.getElementById("assump5");
+  a5.querySelector(".pill").outerHTML = pillHTML(cfg.hetero?"bad":"ok", cfg.hetero?"Violado":"Se cumple");
+  a5.querySelector(".detail").textContent = cfg.hetero
+    ? `Var(u|X₁) escala con (1+${fmt(cfg.heteroGamma,2)}·|X₁ estandarizada|).`
+    : "Var(u|X) constante por construcción.";
+}
+
+/* ---------------------------------------------------------------------
+   16. Estado inicial / vacíos / estatus
+   --------------------------------------------------------------------- */
+function renderAllEmpty(){
+  setEmptyPlot(document.getElementById("plot3d"), '<div class="empty-state">Extraiga una muestra para visualizar la nube de puntos y el plano ajustado.</div>');
+  setEmptyPlot(document.getElementById("plot2d"), '<div class="empty-state">Extraiga una muestra para visualizar la dispersión y la recta de regresión.</div>');
+  setEmptyPlot(document.getElementById("plotHistA"), '<div class="empty-state">Ejecute la simulación Monte Carlo.</div>');
+  setEmptyPlot(document.getElementById("plotHistB"), '<div class="empty-state">Ejecute la simulación Monte Carlo.</div>');
+  setEmptyPlot(document.getElementById("plotCoords"), '<div class="empty-state">Ejecute la simulación Monte Carlo.</div>');
+  document.getElementById("currentTableWrap").innerHTML = '<div class="table-empty">Sin muestra extraída.</div>';
+  document.getElementById("mcTableWrap").innerHTML = '<div class="table-empty">Sin simulación ejecutada.</div>';
+  document.getElementById("pinCount").textContent = "0";
+  ensureUISelections();
+}
+function renderPopStatus(){
+  const s = state.pop.stats;
+  const b = state.pop.cfg.beta;
+  const realized = [["X₁",b[1]],["X₂",b[2]],["Z",b[3]]].filter(([,v])=>v!==0).map(([l])=>l);
+  const irrelevant = [["X₁",b[1]],["X₂",b[2]],["Z",b[3]]].filter(([,v])=>v===0).map(([l])=>l);
+  const realizedTxt = `variables realizadas en el PGD: ${realized.length?realized.join(", "):"ninguna"}${irrelevant.length?` (irrelevante(s): ${irrelevant.join(", ")})`:""}`;
+  document.getElementById("popStatus").innerHTML =
+    `N=${state.pop.N.toLocaleString("es-AR")} generada · ${realizedTxt} · ρ(X₁,X₂) realizada=${fmt(s.corrX1X2,2)} · media(u)=${fmt(s.U.mean,2)} · Corr(u,X₁)=${fmt(s.corrUX1,2)} · Corr(u,X₂)=${fmt(s.corrUX2,2)}`;
+}
+function enableSamplingControls(on){
+  ["newSampleBtn","runMCBtn"].forEach(id=>document.getElementById(id).disabled = !on);
+  document.getElementById("pinLineBtn").disabled = true;
+  document.getElementById("clearPinsBtn").disabled = true;
+}
+
+/* ---------------------------------------------------------------------
+   17. Eventos
+   --------------------------------------------------------------------- */
+function bindRangeReadout(id, decimals){
+  const el = document.getElementById(id);
+  const out = document.getElementById(id+"val");
+  if (!out) return;
+  const upd = ()=>{ out.textContent = (+el.value).toFixed(decimals===undefined?2:decimals); };
+  el.addEventListener("input", upd); upd();
+}
+/* ---------------------------------------------------------------------
+   0-bis. Conmutador de tema (claro / oscuro), persistido por visor
+   --------------------------------------------------------------------- */
+const THEME_KEY = "blue-ols-theme-pref";
+function getStoredTheme(){
+  try { return localStorage.getItem(THEME_KEY); } catch(e){ return null; }
+}
+function setStoredTheme(v){
+  try { localStorage.setItem(THEME_KEY, v); } catch(e){ /* almacenamiento no disponible: se ignora */ }
+}
+function effectiveTheme(){
+  const stored = getStoredTheme();
+  if (stored === "light" || stored === "dark") return stored;
+  return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+}
+function applyThemeAttr(theme){
+  if (theme === "light") document.documentElement.setAttribute("data-theme","light");
+  else document.documentElement.setAttribute("data-theme","dark");
+}
+function updateThemeToggleUI(){
+  const btn = document.getElementById("themeToggle");
+  if (!btn) return;
+  const eff = effectiveTheme();
+  const icon = btn.querySelector(".theme-toggle-icon");
+  const label = btn.querySelector(".theme-toggle-label");
+  if (eff === "dark"){ icon.textContent = "\u{1F319}"; label.textContent = "Oscuro"; }
+  else { icon.textContent = "☀️"; label.textContent = "Claro"; }
+  btn.setAttribute("aria-pressed", eff === "dark" ? "true" : "false");
+}
+function initThemeToggle(){
+  // Se fija explícitamente el atributo data-theme (en lugar de dejarlo implícito
+  // en la preferencia del sistema) para que el botón sea la fuente de verdad y
+  // el estado sea consistente entre recargas dentro del mismo navegador.
+  applyThemeAttr(effectiveTheme());
+  updateThemeToggleUI();
+  document.getElementById("themeToggle").addEventListener("click", ()=>{
+    const next = effectiveTheme() === "dark" ? "light" : "dark";
+    setStoredTheme(next);
+    applyThemeAttr(next);       // el MutationObserver sobre data-theme re-tematiza Plotly automáticamente
+    updateThemeToggleUI();
+  });
+}
+
+/* ---------------------------------------------------------------------
+   0-ter. Casillas "variable realizada en el PGD": al desactivar X_k, su
+   β se fija en 0 (variable presente en la población pero irrelevante).
+   --------------------------------------------------------------------- */
+const PGD_VAR_MAP = { popActiveX1:{beta:"beta1", label:"X₁", remembered:2}, popActiveX2:{beta:"beta2", label:"X₂", remembered:-1.5}, popActiveZ:{beta:"beta3", label:"Z", remembered:3} };
+function bindPgdVarToggle(chkId){
+  const cfgv = PGD_VAR_MAP[chkId];
+  const chk = document.getElementById(chkId);
+  const betaInput = document.getElementById(cfgv.beta);
+  chk.addEventListener("change", ()=>{
+    if (chk.checked){
+      betaInput.disabled = false;
+      betaInput.value = cfgv.remembered;
+    } else {
+      const cur = +betaInput.value;
+      if (cur !== 0) cfgv.remembered = cur; // recuerda el último valor para restaurarlo al reactivar
+      betaInput.disabled = true;
+      betaInput.value = "0";
+    }
+    updatePgdActiveStatus();
+  });
+}
+function updatePgdActiveStatus(){
+  const activeLabels = Object.keys(PGD_VAR_MAP).filter(id=>document.getElementById(id).checked).map(id=>PGD_VAR_MAP[id].label);
+  const inactiveLabels = Object.keys(PGD_VAR_MAP).filter(id=>!document.getElementById(id).checked).map(id=>PGD_VAR_MAP[id].label);
+  const el = document.getElementById("pgdActiveStatus");
+  el.textContent = inactiveLabels.length
+    ? `Variables realizadas en el PGD: ${activeLabels.length ? activeLabels.join(", ") : "ninguna (solo β₀)"} · inactiva(s) con β≡0: ${inactiveLabels.join(", ")}.`
+    : `Variables realizadas en el PGD: ${activeLabels.join(", ")}.`;
+}
+
+function init(){
+  initThemeToggle();
+  bindRangeReadout("rhoX",2); bindRangeReadout("rhoU1",2); bindRangeReadout("rhoU2",2); bindRangeReadout("heteroGamma",2);
+  Object.keys(PGD_VAR_MAP).forEach(bindPgdVarToggle);
+  updatePgdActiveStatus();
+
+  document.getElementById("genPopBtn").addEventListener("click", generatePopulation);
+  document.getElementById("randSeedBtn").addEventListener("click", ()=>{
+    document.getElementById("seed").value = Math.floor(Math.random()*1e8);
+  });
+  document.getElementById("newSampleBtn").addEventListener("click", drawNewSample);
+  document.getElementById("pinLineBtn").addEventListener("click", pinCurrentLine);
+  document.getElementById("clearPinsBtn").addEventListener("click", clearPinnedLines);
+  document.getElementById("runMCBtn").addEventListener("click", async ()=>{
+    const btn = document.getElementById("runMCBtn");
+    btn.disabled = true; btn.textContent = "Calculando…";
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    try { runMonteCarlo(); } finally { btn.disabled = false; btn.textContent = "Ejecutar Monte Carlo (R)"; }
+  });
+
+  ["regX1","regX2","regZ"].forEach(id=>{
+    document.getElementById(id).addEventListener("change", (e)=>{
+      enforceAtLeastOneRegressor(id);
+      if (state.pop){
+        recomputePopulationRegression();
+        state.selectedVars = getSelectedVars();
+        state.pinnedLines = [];
+        state.current = null; state.mc = null;
+        refreshAssumptionBadges(readConfig());
+        renderAllEmpty();
+      }
+    });
+  });
+
+  // recalcular insignias de supuestos en vivo ante cualquier cambio del PGD (aún sin regenerar población)
+  ["rhoX","uMu","rhoU1","rhoU2","hetero","heteroGamma"].forEach(id=>{
+    document.getElementById(id).addEventListener("input", ()=>refreshAssumptionBadges(readConfig()));
+  });
+
+  refreshAssumptionBadges(readConfig());
+
+  // adaptar los gráficos Plotly ya renderizados al cambiar el tema del visor
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const reTheme = ()=>{
+    ["plot3d","plot2d","plotHistA","plotHistB","plotCoords"].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el && el.data) Plotly.relayout(el, baseLayout());
+    });
+    if (state.current){ renderCurrentSamplePanels(); }
+    if (state.mc){ renderHistPanels(); renderCoordPanel(); }
+  };
+  mq.addEventListener("change", reTheme);
+  new MutationObserver(reTheme).observe(document.documentElement, { attributes:true, attributeFilter:["data-theme"] });
+
+  // Estado inicial: se genera una población y una demostración de ejemplo al cargar
+  // la página, de modo que los seis paneles muestren de inmediato un caso de trabajo
+  // real (Gauss–Markov satisfecho) en lugar de un lienzo vacío.
+  generatePopulation();
+  drawNewSample();
+  pinCurrentLine();
+  drawNewSample();
+  runMonteCarlo();
+  document.getElementById("sampleStatus").textContent = "Demostración inicial cargada (2 muestras, 1 recta fijada, Monte Carlo con R=200). Explore los controles para modificar el diseño.";
+}
+init();
+</script>
