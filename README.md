@@ -5,7 +5,7 @@ Simulador interactivo, autocontenido y sin dependencias de compilación, para de
 
 **[▶ Abrir el simulador](https://fcontiggiani.github.io/ols-blue/mco-como-blue.html)**
 
-![Captura del simulador: ](screenshot.png)
+![Captura del simulador MCO como BLUE, mostrando los paneles de parámetros del PGD, dispersión 3D con plano de regresión, dispersión 2D, histogramas de la distribución muestral de los coeficientes y el panel de coordenadas de los β̂ estimados](assets/screenshot-simulador.png)
 
 ---
 
