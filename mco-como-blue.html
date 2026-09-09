@@ -202,7 +202,7 @@
 
   <div class="topbar">
     <div class="topbar-head">
-      <div class="eyebrow">Estadística Matemática — laboratorio interactivo</div>
+      <div class="eyebrow">Asistente Docencia Econometría y Estadística — laboratorio interactivo</div>
       <button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false" title="Cambiar entre fondo claro y oscuro">
         <span class="theme-toggle-icon" aria-hidden="true">&#9728;&#65039;</span>
         <span class="theme-toggle-label">Claro</span>
@@ -249,8 +249,8 @@
       </div>
 
       <div class="card ctrl-card">
-        <h3>2 &middot; Regresores X&#8321;, X&#8322; <span class="assumption-tag">MLR.3</span></h3>
-        <p class="help">La correlación entre X&#8321; y X&#8322; permite acercar el diseño a la colinealidad (imperfecta o casi perfecta).</p>
+        <h3>2 &middot; Regresores X&#8321;, X&#8322; y Z <span class="assumption-tag">MLR.3</span></h3>
+        <p class="help">La correlación entre X&#8321; y X&#8322; permite acercar el diseño a la colinealidad (imperfecta o casi perfecta). La dummy binaria Z se genera de manera independiente de X&#8321; y X&#8322;, con su propio parámetro de distribución.</p>
         <div class="field-row">
           <div class="field"><label for="x1dist">Distribución X&#8321;</label>
             <select id="x1dist"><option value="normal">Normal</option><option value="skew">Asimétrica (no normal)</option></select>
@@ -271,6 +271,12 @@
           <label for="rhoX">Correlación nominal &#961;(X&#8321;,X&#8322;) &#8212; <span id="rhoXval" class="mono">0.00</span></label>
           <input type="range" id="rhoX" min="-0.95" max="0.95" step="0.05" value="0">
           <div class="range-readout"><span>colineal (&#8722;)</span><span>independientes</span><span>colineal (+)</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+          <label for="zProb">Distribución Z &#8212; P(Z=1) &#8212; <span id="zProbval" class="mono">0.50</span></label>
+          <input type="range" id="zProb" min="0.05" max="0.95" step="0.05" value="0.5">
+          <div class="range-readout"><span>Z&#8776;0 predominante</span><span>equilibrada</span><span>Z&#8776;1 predominante</span></div>
         </div>
       </div>
 
@@ -297,7 +303,7 @@
         <div class="divider"></div>
         <label class="checkline"><input type="checkbox" id="hetero"> Activar heterocedasticidad: Var(u|X&#8321;) creciente en |X&#8321;|</label>
         <div class="field">
-          <label for="heteroGamma">&#947; &#8212; intensidad heterocedástica &#8212; <span id="heteroGammaVal" class="mono">1.20</span></label>
+          <label for="heteroGamma">&#947; &#8212; intensidad heterocedástica &#8212; <span id="heteroGammaval" class="mono">1.20</span></label>
           <input type="range" id="heteroGamma" min="0" max="3" step="0.1" value="1.2">
         </div>
       </div>
@@ -565,6 +571,7 @@ function readConfig(){
     x2mu: +document.getElementById("x2mu").value,
     x2sigma: Math.max(0.05, +document.getElementById("x2sigma").value),
     rhoX: clamp(+document.getElementById("rhoX").value, -0.97, 0.97),
+    zProb: clamp(+document.getElementById("zProb").value, 0.02, 0.98),
     uMu: +document.getElementById("uMu").value,
     uSigma: Math.max(0.05, +document.getElementById("uSigma").value),
     uDist: document.getElementById("uDist").value,
@@ -602,7 +609,7 @@ function generatePopulation(){
     const rem = Math.max(1e-6, 1 - ru1*ru1 - ru2*ru2);
     const zu = ru1*za + ru2*zb + Math.sqrt(rem)*zc;
     Uraw[i] = errorFamilyTransform(zu, cfg.uDist);
-    Z[i] = rng() < 0.5 ? 0 : 1;
+    Z[i] = rng() < (1 - cfg.zProb) ? 0 : 1;
   }
 
   const X1 = rescale(X1raw, cfg.x1mu, cfg.x1sigma);
@@ -1360,7 +1367,7 @@ function renderPopStatus(){
   const irrelevant = [["X₁",b[1]],["X₂",b[2]],["Z",b[3]]].filter(([,v])=>v===0).map(([l])=>l);
   const realizedTxt = `variables realizadas en el PGD: ${realized.length?realized.join(", "):"ninguna"}${irrelevant.length?` (irrelevante(s): ${irrelevant.join(", ")})`:""}`;
   document.getElementById("popStatus").innerHTML =
-    `N=${state.pop.N.toLocaleString("es-AR")} generada · ${realizedTxt} · ρ(X₁,X₂) realizada=${fmt(s.corrX1X2,2)} · media(u)=${fmt(s.U.mean,2)} · Corr(u,X₁)=${fmt(s.corrUX1,2)} · Corr(u,X₂)=${fmt(s.corrUX2,2)}`;
+    `N=${state.pop.N.toLocaleString("es-AR")} generada · ${realizedTxt} · ρ(X₁,X₂) realizada=${fmt(s.corrX1X2,2)} · P(Z=1) realizada=${fmt(s.Z.mean,2)} · media(u)=${fmt(s.U.mean,2)} · Corr(u,X₁)=${fmt(s.corrUX1,2)} · Corr(u,X₂)=${fmt(s.corrUX2,2)}`;
 }
 function enableSamplingControls(on){
   ["newSampleBtn","runMCBtn"].forEach(id=>document.getElementById(id).disabled = !on);
@@ -1454,7 +1461,7 @@ function updatePgdActiveStatus(){
 
 function init(){
   initThemeToggle();
-  bindRangeReadout("rhoX",2); bindRangeReadout("rhoU1",2); bindRangeReadout("rhoU2",2); bindRangeReadout("heteroGamma",2);
+  bindRangeReadout("rhoX",2); bindRangeReadout("rhoU1",2); bindRangeReadout("rhoU2",2); bindRangeReadout("heteroGamma",2); bindRangeReadout("zProb",2);
   Object.keys(PGD_VAR_MAP).forEach(bindPgdVarToggle);
   updatePgdActiveStatus();
 

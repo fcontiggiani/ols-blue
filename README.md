@@ -26,7 +26,7 @@ A diferencia de una demostración puramente teórica, el simulador distingue exp
 | Panel / control | Descripción |
 |---|---|
 | **Parámetros estructurales del PGD** | β₀–β₃ configurables; casillas para decidir qué variables se *realizan* (afectan a Y) en la población — permite construir el caso complementario al sesgo por omisión: una variable genuinamente irrelevante incluida en la estimación. |
-| **Regresores X₁, X₂** | Distribución normal o asimétrica; correlación nominal entre ambos (aproxima la colinealidad, MLR.3). |
+| **Regresores X₁, X₂ y Z** | X₁ y X₂: distribución normal o asimétrica; correlación nominal entre ambos (aproxima la colinealidad, MLR.3). Z: probabilidad P(Z=1) configurable para la dummy binaria, generada de forma independiente de X₁ y X₂. |
 | **Proceso del error *u*** | Media, dispersión y distribución configurables; correlación con X₁/X₂ (endogeneidad, rompe MLR.4); interruptor de heterocedasticidad Var(u\|X₁) creciente en \|X₁\| (rompe MLR.5). |
 | **Población** | Generación única de N observaciones (por defecto 200.000) con semilla explícita (PRNG `mulberry32`) para garantizar reproducibilidad. |
 | **Diseño muestral** | Tamaño de muestra n ∈ {10, 50, 100, 1000, 10000}; selección de regresores a incluir en el modelo estimado; número de repeticiones Monte Carlo R. |
@@ -78,7 +78,7 @@ Wooldridge, J. M. (2020). *Introductory Econometrics: A Modern Approach* (7.ª e
 
 ## Autoría
 
-Federico Contiggiani — Universidad Nacional de Río Negro (UNRN) · Instituto de Investigaciones en Políticas Públicas y Gobierno (IIPPyG) · CONICET.
+Federico Contiggiani — Universidad Nacional de Río Negro (UNRN)
 
 ## Licencia
 
